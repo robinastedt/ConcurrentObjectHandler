@@ -1,9 +1,9 @@
 # ConcurrentObjectHandler
 Concurrent Object Handler for Java
 
-## AUTHOR: Robin Åstedt
+#### AUTHOR: Robin Åstedt
 
-## BUILD VERSION: 4
+#### BUILD VERSION: 4
 
 ## INTRODUCTION:
 
