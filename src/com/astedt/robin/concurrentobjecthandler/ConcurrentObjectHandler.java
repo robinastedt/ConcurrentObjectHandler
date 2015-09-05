@@ -8,6 +8,7 @@ USAGE:
 
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ public class ConcurrentObjectHandler implements Runnable {
     List<ConcurrentObjectWorker> workers;
     List<Thread> workerThreads;
     List<ConcurrentObject> objects;
+    LinkedList<ConcurrentObject> newObjects;
     int workerCount;
     Thread handlerThread;
     
@@ -36,6 +38,8 @@ public class ConcurrentObjectHandler implements Runnable {
             }
             
             while (running) {
+                
+                
                 boolean allWorkersDone = true;
                 for (ConcurrentObjectWorker worker : workers) {
                     if (worker.phase == ConcurrentObjectWorker.ExecutionPhases.READING ||
@@ -44,6 +48,20 @@ public class ConcurrentObjectHandler implements Runnable {
                     }
                 }
                 if (allWorkersDone) {
+                    while (!newObjects.isEmpty()) {
+                        ConcurrentObject object = newObjects.pollFirst();
+                        int lightestLoad = -1;
+                        ConcurrentObjectWorker lightestWorker = null;
+                        for (ConcurrentObjectWorker worker : workers) {
+                            int workload = worker.getWorkload();
+                            if (lightestLoad == -1 || workload < lightestLoad) {
+                                lightestLoad = workload;
+                                lightestWorker = worker;
+                            }
+                        }
+                        lightestWorker.addConcurrentObject(object);
+                    }
+                    
                     for (ConcurrentObjectWorker worker : workers) {
                         worker.proceed();
                     }
@@ -94,10 +112,11 @@ public class ConcurrentObjectHandler implements Runnable {
     
     public boolean init(int workerCount, List<ConcurrentObject> objects) {
         if (initialized) return false;
+        newObjects = new LinkedList<>();
         addWorkers(workerCount);
         addObjects(objects);
         initWorkerThreads();
-        handlerThread = new Thread(this);
+        handlerThread = new Thread(this, "ConcurrentObjectHandler");
         initialized = true;
         return true;
     }
@@ -122,7 +141,7 @@ public class ConcurrentObjectHandler implements Runnable {
         
         workerThreads = new ArrayList<>();
         for (ConcurrentObjectWorker worker : workers) {
-            Thread thread = new Thread(worker);
+            Thread thread = new Thread(worker, "ConcurrentObjectWorker id=" + worker.id);
             workerThreads.add(thread);
         }
     }
@@ -157,7 +176,14 @@ public class ConcurrentObjectHandler implements Runnable {
             }
         }
     }
-
+    
+    public void addNewObjects(List<ConcurrentObject> newObjects) {
+        this.newObjects.addAll(newObjects);
+    }
+    
+    public void addNewObject(ConcurrentObject newObject) {
+        this.newObjects.add(newObject);
+    }
     
     
 }

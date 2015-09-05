@@ -9,7 +9,23 @@ USAGE:
 */
 
 
-public interface ConcurrentObject {
-    public void read(List<ConcurrentObject> objectList);
-    public void write();
+public class ConcurrentObject {
+    
+    private boolean removeFlag = false;
+    
+    public boolean isFlaggedForRemoval() {
+        return removeFlag;
+    }
+    
+    public void remove() {
+        removeFlag = true;
+    }
+    
+    public void read(List<ConcurrentObject> objectList) {
+        
+    }
+    public void write() {
+        
+    }
+    
 }

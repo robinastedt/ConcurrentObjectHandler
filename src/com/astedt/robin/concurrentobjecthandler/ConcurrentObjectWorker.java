@@ -7,13 +7,15 @@ USAGE:
 */
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConcurrentObjectWorker implements Runnable {
     
     int id;
-    ArrayList<ConcurrentObject> objects;
+    List<ConcurrentObject> objects;
+    List<ConcurrentObject> removalList;
     ExecutionPhases phase;
     
     boolean running;
@@ -29,11 +31,16 @@ public class ConcurrentObjectWorker implements Runnable {
     public ConcurrentObjectWorker(int id) {
         this.id = id;
         objects = new ArrayList<>();
+        removalList = new ArrayList<>();
         phase = ExecutionPhases.INITIALIZED;
     }
     
     public void addConcurrentObject(ConcurrentObject object) {
         objects.add(object);
+    }
+    
+    public int getWorkload() {
+        return objects.size();
     }
     
     public void stop() {
@@ -70,7 +77,18 @@ public class ConcurrentObjectWorker implements Runnable {
                 case WRITING:
                 {
                     for (ConcurrentObject object : objects) {
-                        object.write();
+                        if (object.isFlaggedForRemoval()) {
+                            removalList.add(object);
+                        }
+                        else {
+                            object.write();
+                        }
+                    }
+                    if (!removalList.isEmpty()) {
+                        for (ConcurrentObject object : removalList) {
+                            objects.remove(object);
+                        }
+                        removalList.clear();
                     }
                     phase = ExecutionPhases.WRITING_DONE;
                 }

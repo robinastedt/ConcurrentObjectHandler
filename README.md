@@ -3,7 +3,7 @@ Concurrent Object Handler for Java
 
 AUTHOR: Robin Åstedt
 
-BUILD VERSION: 1
+BUILD VERSION: 2
 
 INTRODUCTION:
 
@@ -16,6 +16,8 @@ First it will let all objects update their internal state and lets the objects r
 
 When all objects have updated their internal state it will issue a write command to all objects and copy their internal state to their external fields accesable by their public methods. This ensures that information that is fetched from another object will remain the same during the whole read cycle and should, thus, be thread-safe.
 
+Each object can safely be flagged for removal and new objects can be queued up to be added to the worker pool. When new objects are queued for addition the handler will allocate the objects to the worker threads with the currently lowest load.
+
 
 
 DISCLAIMER:
@@ -24,7 +26,7 @@ This is intended as a proof of concept and has not been properly tested. Please 
 
 USAGE:
 
- * Let your objects implement ```ConcurrentObject```
+ * Let your objects extend ```ConcurrentObject```
 
  * Create a new instance of ```ConcurrentObjectHandler```
 
@@ -38,45 +40,39 @@ USAGE:
  * When the work is done, call ```stop()```
  
  * If needed, you can ask the handler if it ```isRunning()```
+ 
+ * Call ```remove()``` on any object to flag it for removal.
+ 
+ * Call ```addNewObject(ConcurrentObject newObject)``` or ```newNewObjects(List<ConcurrentObject> newObjects)``` on the handler to queue up new objects to be allocated to worker threads.
+ 
+ * Check out ```Example.java``` and ```ExampleObject.java``` to get an idea of how to use it.
 
 
 EXAMPLE IMPLEMENTATION:
 
 ```java
-   public class TestObject implements ConcurrentObject {
-       
-      // Internal fields
-       private float x, y;
-       
-       // External fields
-       private float x_, y_;
-       
-       // Getters for external fields
-       public float getX() {
-           return x_;
-       }
-       public float getY() {
-           return y_;
-       }
-       
-       @Override
-       public void read(List<ConcurrentObject> concurrentObjectList) {
-           for (ConcurrentObject concurrentObject : concurrentObjectList) {
-               TestObject object = (TestObject)concurrentObject;
-               
-               //TODO: Read values from objects
-           }
-           
-           
-       }
-   
-       @Override
-       public void write() {
-           x_ = x;
-           y_ = y;
-       }
-       
-   }
+public class ExampleObject extends ConcurrentObject {
+    
+    private float x_, y_;
+    public float x, y;
+    
+    @Override
+    public void read(List<ConcurrentObject> concurrentObjectList) {
+        for (ConcurrentObject concurrentObject : concurrentObjectList) {
+            ExampleObject object = (ExampleObject)concurrentObject;
+            
+            //TODO: Read values from objects
+        }
+        
+    }
+
+    @Override
+    public void write() {
+        x = x_;
+        y = y_;
+    }
+    
+}
 ```
 
 
