@@ -1,11 +1,11 @@
 # ConcurrentObjectHandler
 Concurrent Object Handler for Java
 
-AUTHOR: Robin Åstedt
+## AUTHOR: Robin Åstedt
 
-BUILD VERSION: 4
+## BUILD VERSION: 4
 
-INTRODUCTION:
+## INTRODUCTION:
 
 The reason for this project is to create a framework for dealing with concurrency in n-body systems where you'd want to assign several threads to update a large amount of objects.
 Mainly created for simulation environments but could be applied elsewhere.
@@ -20,11 +20,11 @@ Each object can safely be flagged for removal and new objects can be queued up t
 
 
 
-DISCLAIMER:
+## DISCLAIMER:
 
 This is intended as a proof of concept and has not been properly tested. Please review the source code before use.
 
-USAGE:
+## USAGE:
 
  * Let your objects extend ```ConcurrentObject```
 
@@ -48,7 +48,7 @@ USAGE:
  * Check out ```Example.java``` and ```ExampleObject.java``` to get an idea of how to use it.
 
 
-EXAMPLE IMPLEMENTATION:
+## EXAMPLE IMPLEMENTATION:
 
 ```java
 public class ExampleObject extends ConcurrentObject {
