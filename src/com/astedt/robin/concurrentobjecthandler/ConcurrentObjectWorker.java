@@ -114,9 +114,4 @@ public class ConcurrentObjectWorker implements Runnable {
             }
         }
     }
-    
-    public List<ConcurrentObject> getRemovalList() {
-        return removalList;
-    }
-    
 }
