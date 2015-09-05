@@ -3,6 +3,8 @@ Concurrent Object Handler for Java
 
 AUTHOR: Robin Åstedt
 
+BUILD VERSION: 1
+
 INTRODUCTION:
 
 The reason for this project is to create a framework for dealing with concurrency in n-body systems where you'd want to assign several threads to update a large amount of objects.
