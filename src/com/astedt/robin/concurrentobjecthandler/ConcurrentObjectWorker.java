@@ -17,6 +17,7 @@ public class ConcurrentObjectWorker implements Runnable {
     List<ConcurrentObject> objects;
     List<ConcurrentObject> removalList;
     ExecutionPhases phase;
+    ConcurrentObjectHandler handler;
     
     boolean running;
     
@@ -28,11 +29,16 @@ public class ConcurrentObjectWorker implements Runnable {
         WRITING_DONE
     }
     
-    public ConcurrentObjectWorker(int id) {
+    public ConcurrentObjectWorker(ConcurrentObjectHandler handler, int id) {
+        this.handler = handler;
         this.id = id;
         objects = new ArrayList<>();
         removalList = new ArrayList<>();
         phase = ExecutionPhases.INITIALIZED;
+    }
+    
+    public List<ConcurrentObject> getObjects() {
+        return objects;
     }
     
     public void addConcurrentObject(ConcurrentObject object) {
@@ -107,6 +113,10 @@ public class ConcurrentObjectWorker implements Runnable {
                 break;
             }
         }
+    }
+    
+    public List<ConcurrentObject> getRemovalList() {
+        return removalList;
     }
     
 }

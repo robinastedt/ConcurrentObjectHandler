@@ -18,7 +18,6 @@ public class ConcurrentObjectHandler implements Runnable {
     // Fields
     List<ConcurrentObjectWorker> workers;
     List<Thread> workerThreads;
-    List<ConcurrentObject> objects;
     LinkedList<ConcurrentObject> newObjects;
     int workerCount;
     Thread handlerThread;
@@ -48,6 +47,7 @@ public class ConcurrentObjectHandler implements Runnable {
                     }
                 }
                 if (allWorkersDone) {
+                    
                     while (!newObjects.isEmpty()) {
                         ConcurrentObject object = newObjects.pollFirst();
                         int lightestLoad = -1;
@@ -126,6 +126,10 @@ public class ConcurrentObjectHandler implements Runnable {
     }
     
     public List<ConcurrentObject> getObjects() {
+        List<ConcurrentObject> objects = new ArrayList<>();
+        for (ConcurrentObjectWorker worker : workers) {
+            objects.addAll(worker.getObjects());
+        }
         return objects;
     }
     
@@ -151,13 +155,12 @@ public class ConcurrentObjectHandler implements Runnable {
         workerCount = count;
         workers = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            ConcurrentObjectWorker worker = new ConcurrentObjectWorker(i);
+            ConcurrentObjectWorker worker = new ConcurrentObjectWorker(this, i);
             workers.add(worker);
         }
     }
     
     private void addObjects(List<ConcurrentObject> objects) {
-        this.objects = objects;
         
         int objectCount = objects.size();
         int objectsPerWorker = objectCount / workerCount;
@@ -184,6 +187,6 @@ public class ConcurrentObjectHandler implements Runnable {
     public void addNewObject(ConcurrentObject newObject) {
         this.newObjects.add(newObject);
     }
-    
+
     
 }
