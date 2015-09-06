@@ -14,8 +14,19 @@ import java.util.List;
  */
 public class ExampleObject extends ConcurrentObject {
     
+    //Internal fields
+    private float x, y;
+    
+    //External fields
     private float x_, y_;
-    public float x, y;
+    
+    //Public methods to access external fields
+    public float getX() {
+        return x_;
+    }
+    public float getY() {
+        return y_;
+    }
     
     @Override
     public void read(List<ConcurrentObject> concurrentObjectList) {
@@ -29,8 +40,8 @@ public class ExampleObject extends ConcurrentObject {
 
     @Override
     public void write() {
-        x = x_;
-        y = y_;
+        x_ = x;
+        y_ = y;
     }
     
 }
