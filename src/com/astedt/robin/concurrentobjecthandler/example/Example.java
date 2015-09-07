@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class Example {
     
-    
+    public static float singleton;
 
     /**
      * @param args the command line arguments
@@ -30,13 +30,13 @@ public class Example {
        ConcurrentObjectHandler objHandler = new ConcurrentObjectHandler();
        objHandler.init(10, objects);
        objHandler.start();
-       
-       
+
+       /*
        while (objHandler.isRunning()) {
            ExampleObject object = new ExampleObject();
            objHandler.addNewObject(object);
        }
-        
+       */
     }
     
    

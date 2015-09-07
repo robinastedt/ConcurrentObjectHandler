@@ -18,6 +18,7 @@ public class ConcurrentObjectHandler implements Runnable {
     // Fields
     List<ConcurrentObjectWorker> workers;
     List<Thread> workerThreads;
+    List<ConcurrentObject> objects;
     LinkedList<ConcurrentObject> newObjects;
     int workerCount;
     Thread handlerThread;
@@ -61,6 +62,7 @@ public class ConcurrentObjectHandler implements Runnable {
                         // LinkedList and pollFirst() makes sure we can
                         // add objects to newObjects at any time.
                         ConcurrentObject object = newObjects.pollFirst();
+                        objects.add(object);
                         
                         // Determine which worker currently has the lightest load
                         int lightestLoad = -1;
@@ -136,9 +138,10 @@ public class ConcurrentObjectHandler implements Runnable {
     // list of workers to be added.
     public boolean init(int workerCount, List<ConcurrentObject> objects) {
         if (initialized) return false;
+        this.objects = objects;
         newObjects = new LinkedList<>();
         addWorkers(workerCount);
-        addObjects(objects);
+        addObjectsToWorkers(objects);
         initWorkerThreads();
         handlerThread = new Thread(this, "ConcurrentObjectHandler");
         initialized = true;
@@ -150,14 +153,8 @@ public class ConcurrentObjectHandler implements Runnable {
         return running;
     }
     
-    // You should keep track of your own objects!
-    // This function is slow, since it builds a new list from its workers.
-    // Use with caution!
+    //Returns list of all objects
     public List<ConcurrentObject> getObjects() {
-        List<ConcurrentObject> objects = new ArrayList<>();
-        for (ConcurrentObjectWorker worker : workers) {
-            objects.addAll(worker.getObjects());
-        }
         return objects;
     }
     
@@ -180,7 +177,7 @@ public class ConcurrentObjectHandler implements Runnable {
         workerCount = count;
         workers = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            ConcurrentObjectWorker worker = new ConcurrentObjectWorker(i);
+            ConcurrentObjectWorker worker = new ConcurrentObjectWorker(objects, i);
             workers.add(worker);
         }
     }
@@ -189,7 +186,7 @@ public class ConcurrentObjectHandler implements Runnable {
     // Only called once during initialization to add initial objects
     // Not safe to run afterwards!
     // Instead use public function addNewObjects
-    private void addObjects(List<ConcurrentObject> objects) {
+    private void addObjectsToWorkers(List<ConcurrentObject> objects) {
         
         int objectCount = objects.size();
         int objectsPerWorker = objectCount / workerCount;

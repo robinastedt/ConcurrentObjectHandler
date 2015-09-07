@@ -16,6 +16,7 @@ public class ConcurrentObjectWorker implements Runnable {
     
     // Fields
     int id;
+    List<ConcurrentObject> handlerObjectList;
     List<ConcurrentObject> objects;
     List<ConcurrentObject> removalList;
     ExecutionPhases phase;
@@ -35,7 +36,8 @@ public class ConcurrentObjectWorker implements Runnable {
     
     // Constructor, initializes the fields
     // Accepts an id, only used for bug-tracking.
-    public ConcurrentObjectWorker(int id) {
+    public ConcurrentObjectWorker(List<ConcurrentObject> mainObjectList, int id) {
+        handlerObjectList = mainObjectList;
         this.id = id;
         objects = new ArrayList<>();
         removalList = new ArrayList<>();
@@ -91,7 +93,7 @@ public class ConcurrentObjectWorker implements Runnable {
                 case READING:
                 {
                     for (ConcurrentObject object : objects) {
-                        object.read(objects);
+                        object.read(handlerObjectList);
                     }
                     phase = ExecutionPhases.READING_DONE;
                 }
@@ -112,6 +114,7 @@ public class ConcurrentObjectWorker implements Runnable {
                     if (!removalList.isEmpty()) {
                         for (ConcurrentObject object : removalList) {
                             objects.remove(object);
+                            handlerObjectList.remove(object);
                         }
                         removalList.clear();
                     }
