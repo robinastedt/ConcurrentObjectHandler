@@ -21,34 +21,39 @@ import java.util.logging.Logger;
 public class TestBench implements Runnable{
     
     
+    public static final int TEST_AMOUNT = 10;
+    public static final int TEST_TIME_SECONDS = 60;
+    public static final int MAX_THREADS = 10;
+    public static final int TOTAL_OBJECTS = 5000;
+    
     boolean running;
     List<TestObject1> objects;
     
     public static void main(String[] args) {
         
-        int testAmount = 10;
+        
         
         double baseTestAverage;
         {
             long testTotal = 0;
-            for (int testNumb = 0; testNumb < testAmount; testNumb++) {
+            for (int testNumb = 0; testNumb < TEST_AMOUNT; testNumb++) {
                 long test = baseTest();
                 System.out.println("Base test, #"+ testNumb +": " + test);
                 testTotal += test;
             }
-            double average = (double)testTotal / testAmount;
+            double average = (double)testTotal / TEST_AMOUNT;
             System.out.println("Base test, average: " + average);
             baseTestAverage = average;
         }
         
-        for (int threads = 1; threads <= 10; threads++){
+        for (int threads = 1; threads <= MAX_THREADS; threads++){
             long testTotal = 0;
-            for (int testNumb = 0; testNumb < testAmount; testNumb++) {
+            for (int testNumb = 0; testNumb < TEST_AMOUNT; testNumb++) {
                 long test = concurrentTest(threads);
                 System.out.println(threads + " threads, #" + testNumb + ": " + test + "(ratio: " + test / baseTestAverage + ")");
                 testTotal += test;
             }
-            double average = (double)testTotal / testAmount;
+            double average = (double)testTotal / TEST_AMOUNT;
             System.out.println(threads + " threads, average: " + average + "(ratio: " + average / baseTestAverage + ")");
         }
     }
@@ -56,7 +61,7 @@ public class TestBench implements Runnable{
     public static long concurrentTest(int threads) {
         
         ArrayList<ConcurrentObject> objects2 = new ArrayList<>();
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < TOTAL_OBJECTS; i++) {
             ConcurrentObject object = new TestObject2(new Random().nextDouble());
             objects2.add(object);
         }
@@ -68,7 +73,7 @@ public class TestBench implements Runnable{
 
 
         try {
-            Thread.sleep(1000 * 60);
+            Thread.sleep(1000 * TEST_TIME_SECONDS);
         } catch (InterruptedException ex) {
             Logger.getLogger(TestBench.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -83,7 +88,7 @@ public class TestBench implements Runnable{
     public static long baseTest() {
         
         ArrayList<TestObject1> objects1 = new ArrayList<>();
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < TOTAL_OBJECTS; i++) {
             TestObject1 object = new TestObject1(new Random().nextDouble());
             objects1.add(object);
         }
@@ -94,7 +99,7 @@ public class TestBench implements Runnable{
         thread1.start();
         
         try {
-            Thread.sleep(1000 * 60);
+            Thread.sleep(1000 * TEST_TIME_SECONDS);
         } catch (InterruptedException ex) {
             Logger.getLogger(TestBench.class.getName()).log(Level.SEVERE, null, ex);
         }
