@@ -15,7 +15,6 @@ import java.util.ArrayList;
  */
 public class Example {
     
-    public static float singleton;
 
     /**
      * @param args the command line arguments

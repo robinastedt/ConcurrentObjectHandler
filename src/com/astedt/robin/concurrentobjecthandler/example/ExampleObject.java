@@ -33,9 +33,6 @@ public class ExampleObject extends ConcurrentObject {
         for (ConcurrentObject concurrentObject : concurrentObjectList) {
             ExampleObject object = (ExampleObject)concurrentObject;
             
-            x = Example.singleton;
-            
-            Example.singleton = x;
             //TODO: Read values from objects
         }
         
