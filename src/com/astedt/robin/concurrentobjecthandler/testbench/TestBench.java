@@ -1,6 +1,4 @@
 
-//Fizz buzz
-
 package com.astedt.robin.concurrentobjecthandler.testbench;
 
 import com.astedt.robin.concurrentobjecthandler.ConcurrentObject;
